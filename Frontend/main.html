@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <title>Roti Search</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #f1c749;
+        }
+        * {
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+            list-style: none;
+            font-family: 'Work Sans', sans-serif;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .card img {
+            object-fit: cover;
+        }
+        .bg-info {
+            background-color: #17a2b8 !important;
+        }
+        .search-section {
+            margin-top: 40px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid bg-dark">
+        <div class="row">
+            <div class="col-md-12 py-4 text-center">
+                <h1 class="text-white">Search Bread Page</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container search-section">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group mt-4">
+                    <input type="text" name="Nama" class="form-control" id="search-input" placeholder="Search for Bread...">
+                    <div class="input-group-append">
+                        <button onclick="hasilPencarian()" type="submit" id="search-button" class="btn btn-dark">CARI</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row" id="results"></div>
+    </div>
+
+    <script>
+        function hasilPencarian() {
+            let query = $('#search-input').val();
+
+            $.ajax({
+                url: 'http://127.0.0.1:8000/api/roti/v1/search',
+                method: 'GET',
+                data: { q: query },
+                success: function(res) {
+                    $('#results').empty();
+                    if (res.success === true && query !== "") {
+                        res.data.forEach(function(item) {
+                            let card = `
+                                <div class="col-md-3">
+                                    <div class="card ">
+                                        <img src="http://127.0.0.1:8000/storage/${item.foto}" 
+                                        class="card-img-top" height="170">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${item.nama}</h5>
+                                            <p class="card-text"><strong>Rasa:</strong> ${item.rasa}</p>
+                                            <p class="card-text"><strong>Harga:</strong> ${item.harga}</p>
+                                            <p class="card-text"><strong>Stok:</strong> ${item.stok}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            $('#results').append(card);
+                        });
+                    } else {
+                        $('#results').html('<div class="col-md-12"><p class="text-center">Tidak Ditemukan</p></div>');
+                    }
+                },
+                error: function(err) {
+                    console.error('Error:', err);
+                }
+            });
+        }
+    </script>
+  </body>
+</html>
